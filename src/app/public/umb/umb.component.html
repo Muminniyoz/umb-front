@@ -1,0 +1,58 @@
+<mat-stepper [linear]="isLinear" #stepper>
+    <mat-step [stepControl]="firstFormGroup">
+        <form [formGroup]="firstFormGroup">
+            <ng-template matStepLabel>Execel faylni tuklang</ng-template>
+            <div class="binary">
+                <span>
+                    Faylni tanlang:
+                    <input class="form-control" formControlName="firstCtrl" type="file" (change)="onFileChange($event)"
+                        multiple="false" />
+                </span>
+                <div>
+                    <button mat-raised-button (click)="namunaYuklash()" id="toggle-linear">
+                        Na'muna fayl yuklash
+                    </button>
+                    <button mat-raised-button (click)="reset()" id="toggle-linear">
+                        Reset
+                    </button>
+                </div>
+
+            </div>
+            <hr>
+
+            <div class="table-first">
+                <div>
+                    <hot-table [data]="dataSource" [settings]="hotSettings"></hot-table>
+                </div>
+            </div>
+            <div>
+                <mat-select (selectionChange)="changesheet($event.value)" placeholder="Sheets">
+                    <mat-option *ngFor="let sh of sheets" [value]="sh">{{sh}}</mat-option>
+                </mat-select>
+
+                <button mat-raised-button color="primary" (click)="yuklash()">Yuklash</button>
+                <button mat-raised-button color="primary" (click)="check()">Tekshirish</button>
+                <button mat-raised-button color="primary" [disabled]="!ready" matStepperNext>Keyingisi</button>
+            </div>
+        </form>
+    </mat-step>
+    <mat-step label="Fill out your address">
+
+
+
+
+        <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button matStepperNext>Next</button>
+        </div>
+
+    </mat-step>
+    <mat-step>
+        <ng-template matStepLabel>Done</ng-template>
+        <p>You are now done.</p>
+        <div>
+            <button mat-button matStepperPrevious>Back</button>
+            <button mat-button (click)="stepper.reset()">Reset</button>
+        </div>
+    </mat-step>
+</mat-stepper>

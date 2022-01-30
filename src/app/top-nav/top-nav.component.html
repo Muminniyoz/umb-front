@@ -1,0 +1,73 @@
+<mat-toolbar color="primary" class="fix-nav">
+  <button type="button" mat-icon-button (click)="toggleSidebar()">
+    <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+  </button>
+  <div class="nav-brand">
+    {{title}}
+  </div>
+  <span class="nav-spacer"></span>
+  <button style="overflow: hidden;" mat-button [matMenuTriggerFor]="menu">
+    <mat-icon>language</mat-icon> {{siteLanguage}}
+    <mat-icon>arrow_drop_down</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="changeLang('en')"><img src="assets/gb-eng.svg" alt="en flags">
+      English</button>
+    <button mat-menu-item (click)="changeLang('uz-Lat')"> <img src="assets/uz.svg" alt="uz flags">
+      O'zbek</button>
+    <button mat-menu-item (click)="changeLang('uz-Cyrl')"><img src="assets/uz.svg" alt="uz flags">
+      Ўзбек</button>
+    <button mat-menu-item (click)="changeLang('ru')"><img src="assets/ru.svg" alt="ru flags">
+      Русский</button>
+  </mat-menu>
+
+
+  <!-- <form   class="hidden-sm" style="margin-right: 20px; margin-top: 8px">
+    <mat-form-field style="font-size: 1rem;">
+      <input matInput placeholder="Qidiruv . . .">
+    </mat-form-field>
+  </form> -->
+  <ng-container>
+    <!-- <a href="https://app.jivosite.com/chat/inbox" target="_blank" mat-icon-button>
+      <mat-icon class="mat-18">email</mat-icon>
+    </a> -->
+    <button [matMenuTriggerFor]="profile" mat-icon-button>
+      <mat-icon>account_circle</mat-icon>
+    </button>
+
+
+
+  </ng-container>
+
+
+
+  <mat-menu #profile="matMenu" [overlapTrigger]="false">
+    <ng-container *ngIf="authenticated">
+      <button mat-menu-item  [routerLink]="['/admin/profil']">
+        <mat-icon>person</mat-icon>
+        <span>Profil</span>
+      </button>
+
+
+      <button mat-menu-item (click)="onLoggedout()">
+        <mat-icon>logout</mat-icon>
+        <span>Chiqish</span>
+      </button>
+    </ng-container>
+    <ng-container *ngIf="!authenticated">
+      <button mat-menu-item [routerLink]="['/login']">
+        <mat-icon aria-hidden="false">login</mat-icon>
+        <span>Kirish</span>
+      </button>
+      <button mat-menu-item [routerLink]="['/register']">
+        <mat-icon aria-hidden="false">how_to_reg</mat-icon>
+        <span>Ro'yxatdan o'tish</span>
+      </button>
+    </ng-container>
+
+  </mat-menu>
+
+
+ 
+
+</mat-toolbar>

@@ -1,0 +1,39 @@
+<div class="login-page">
+  <div class="content px20">
+    <form class="login-form" [formGroup]='loginForm' (ngSubmit)="onLogin()">
+      <div class="text-center">
+        <h1 class="app-name">BTCWMZ.UZ
+
+        </h1>
+        <h2> Tizimga kirish</h2>
+      </div>
+      <div fxLayout="row">
+        <div fxFlexFill>
+          <mat-form-field class="w-100">
+            <input matInput formControlName='login' placeholder="Login . . .">
+          </mat-form-field>
+          <mat-form-field class="w-100">
+            <input matInput formControlName='parol' type="password" placeholder="Parol  . . .">
+          </mat-form-field>
+        </div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="space-between" fxLayout.xs="column" class="mt20 mb20">
+        <mat-checkbox formControlName='rememberMe' color="primary" [ngStyle.xs]="{'margin-bottom.px': 10}">Eslab qol
+        </mat-checkbox>
+      </div>
+      <div fxLayout="column">
+        <div fxFlexFill fxFlexFill.lg='6'>
+          <button type="submit" mat-raised-button color="primary" [disabled]='loginForm.invalid || surovBajarilmoqda'
+            class="w-100">Kirish</button>
+
+        </div>
+
+        <div fxFlexFill fxFlexFil.lg='6'>
+          <a class="mt-5" [routerLink]="['/']" color="secondary" class="w-50">Bosh sahifaga qaytish</a>
+        </div>
+      </div>
+
+
+    </form>
+  </div>
+</div>

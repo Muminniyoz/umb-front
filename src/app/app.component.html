@@ -1,10 +1,27 @@
-<router-outlet></router-outlet>
-<table class="sjs-table">
-  <tr *ngFor="let row of data">
-    <td *ngFor="let val of row">
-      {{val}}
-    </td>
-  </tr>
-</table>
+<div class="layout-container">
+    <app-top-nav #tnav (rsideNavToggled)="rsnav.toggle()" (sideNavToggled)="lsnav.toggle()"></app-top-nav>
 
-<input type="file" (change)="onFileChange($event)" multiple="false" /> 
+    <mat-sidenav-container class="sidenav-container" [style.marginTop.px]="toolBarHeight">
+        <mat-sidenav #lsnav class="sidenav mat-elevation-z10" [mode]="sideNavMode" [(opened)]="sideNavOpened">
+            <app-side-nav></app-side-nav>
+        </mat-sidenav>
+
+        <mat-sidenav #rsnav class="sidenav mat-elevation-z10" position="end" [(opened)]="rsideNavOpened" mode="over">
+
+            <mat-toolbar>
+                <mat-icon>email</mat-icon>
+                Xabarlar
+            </mat-toolbar>
+            
+        </mat-sidenav>
+        <mat-sidenav-content>
+            <main class="main-container">
+                <router-outlet></router-outlet>
+            </main>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+
+
+
+
+</div>

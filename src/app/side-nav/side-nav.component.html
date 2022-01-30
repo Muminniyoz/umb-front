@@ -1,0 +1,27 @@
+<mat-nav-list>
+
+  <mat-divider></mat-divider>
+  <a mat-list-item [routerLinkActive]="'active'" [routerLink]="['/']">
+    <mat-icon class="sidenav-icon">dashboard</mat-icon>
+    Bosh sahifa
+  </a>
+  <mat-divider></mat-divider>
+  <a mat-list-item [routerLinkActive]="'active'" [routerLink]="['/umb']">
+    <mat-icon class="sidenav-icon">
+      show_chart
+    </mat-icon>
+    UMB
+  </a>
+  <mat-divider></mat-divider>
+
+  <a mat-list-item *ngIf="isAdmin" [routerLinkActive]="'active'" [routerLink]="['/admin/user']">
+    <mat-icon class="sidenav-icon">account_box</mat-icon>
+    User
+  </a>
+  <mat-divider></mat-divider>
+
+
+
+
+
+</mat-nav-list>
