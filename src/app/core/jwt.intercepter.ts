@@ -1,7 +1,7 @@
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { TranslateService } from "@ngx-translate/core";
+
 import { Observable, throwError } from "rxjs";
 import { catchError } from "rxjs/operators";
 import { JwtUtil } from "./jwt.util";
@@ -12,7 +12,7 @@ export class JwtInterceptor implements HttpInterceptor {
   
 
   constructor(public jwtUtil: JwtUtil, private _snackBar: MatSnackBar,
-    private translate: TranslateService) {
+    ) {
      
   }
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

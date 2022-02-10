@@ -1,9 +1,12 @@
+import { HttpClient } from '@angular/common/http';
 import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import Handsontable from 'handsontable';
 import { createSpreadsheetData } from 'handsontable/helpers';
 import { Subject, SubjectSubscriber } from 'rxjs/internal/Subject';
 import * as XLSX from 'xlsx';
+import { Dialog } from './dialog.component';
 @Component({
   selector: 'app-umb',
   templateUrl: './umb.component.html',
@@ -12,56 +15,14 @@ import * as XLSX from 'xlsx';
 export class UmbComponent implements OnInit, AfterViewInit {
 
   isLinear = false;
-  firstFormGroup!: FormGroup;
-  secondFormGroup!: FormGroup;
-  ready = false;
-
-
+  tanlanganAlgoritm = 1;
   selectedWB!: XLSX.WorkBook;
   selectedSheet: any;
-  sheets: any = [];
+  sheets: { name: string, data: any }[] = [];
 
   columns!: Array<any>;
   displayedColumns!: Array<any>;
-  shablon: any = [
-    [
-      "tjf",
-      "<soha nomi>",
-      "<1-alomat tur>",
-      "<2-alomat tur>",
-      "<3-alomat tur>",
-      "…",
-      "<sinflar soni>",
-      null,
-      null
-    ],
-    [
-      "ton",
-      "<obyekt nomi>",
-      "<1-alomat nom>",
-      "<2-alomat nom>",
-      "<3-alomat nom>",
-      "…",
-      "sinf"
-    ],
-    [],
-    [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      "<soha nom> bu o'rganilayotgan sohadir. Masalan: talabalar xarakteri\r\n<obyekt nomi> - real tajraba obyekti: Masalan: Sardor Jo'rayev\r\n<alomat tur> - obyekt xususiyatining tur: Masalan: NOMINAL, BINARY, NUMERIC\r\n<alomat nom> berilgan obyekt alamoatining nomi: Masalan: Soch rangi.\r\n2-varaqda namuna ko'rsatilgan"
-    ],
-    [], [], [], [], [],
-    [], [], [], [], [],
-    [], [], [], [], []
-  ];
-  dataSource = this.shablon;
+  objectNameExist = true;
   observabele = new Subject<boolean>();
   hotSettings: Handsontable.GridSettings = {
     colHeaders: true,
@@ -71,33 +32,56 @@ export class UmbComponent implements OnInit, AfterViewInit {
     licenseKey: 'non-commercial-and-evaluation',
     afterChange: this.ozgarish,
     afterChangesObserved: this.check
-  };;
+  };
+  checking: boolean = false;
+  ;
+  step = 0;
+
+  setStep(index: number) {
+    this.step = index;
+  }
+
+  nextStep() {
+    this.step++;
+  }
+
+  prevStep() {
+    this.step--;
+  }
 
 
 
 
-  constructor(private _formBuilder: FormBuilder) { }
+  constructor(
+    private _formBuilder: FormBuilder,
+    private http: HttpClient,
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit() {
-    this.firstFormGroup = this._formBuilder.group({
-      firstCtrl: ['', Validators.required],
-    });
-    this.secondFormGroup = this._formBuilder.group({
-      secondCtrl: ['', Validators.required],
-    });
 
-
+    this.http.get('assets/template/ProDon- UMB - example file.xlsx', { responseType: 'arraybuffer' }).subscribe(data => {
+      this.seperate(data);
+    },
+      error => {
+        this.yangiVaraq();
+      })
   }
-  yuklash() {
-    /* generate worksheet */
-    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(this.dataSource);
-
-    /* generate workbook and add the worksheet */
+  saqlash() {
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    for (let sh of this.sheets) {
+
+      /* generate worksheet */
+      const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(sh.data);
+
+      /* generate workbook and add the worksheet */
+
+      XLSX.utils.book_append_sheet(wb, ws, sh.name);
+    }
+
 
     /* save to file */
-    XLSX.writeFile(wb, 'SheetJS.xlsx');
+    XLSX.writeFile(wb, 'ProDon.xlsx');
   }
 
   ngAfterViewInit(): void {
@@ -105,6 +89,8 @@ export class UmbComponent implements OnInit, AfterViewInit {
 
   }
   onFileChange(evt: any) {
+    console.log(evt);
+
     /* wire up file reader */
     const target: DataTransfer = <DataTransfer>(evt.target);
     if (target.files.length !== 1) throw new Error('Cannot use multiple files');
@@ -113,55 +99,121 @@ export class UmbComponent implements OnInit, AfterViewInit {
     reader.onload = (e: any) => {
       /* read workbook */
       console.log(e);
-
       const ab: ArrayBuffer = e.target.result;
-      this.selectedWB = XLSX.read(ab);
-      this.sheets = this.selectedWB.SheetNames;
-      console.log(this.sheets);
-      
-      this.changesheet(this.sheets[0])
-
+      this.seperate(ab);
 
     };
     reader.readAsArrayBuffer(target.files[0]);
   }
   namunaYuklash() {
-    window.open('assets/template/UMB - shablon.xlsx')
-  }
-  reset() {
-
-    this.dataSource = this.shablon;
-  }
-  changesheet(name: string) {
-    const ws: XLSX.WorkSheet = this.selectedWB.Sheets[name];
-
-
-    this.selectedSheet = 0;
-    /* save data */
-    let data = <any>(XLSX.utils.sheet_to_json(ws, { header: 1 }));
-    if (typeof data == "object") {
-      this.seperate(data);
-
-    }
+    window.open('assets/template/ProDon- UMB - example file.xlsx');
   }
 
-  seperate(data: any[]) {
-
-    this.displayedColumns = data[1];
-    // data.splice(0, 2);
-    this.dataSource = data;
+  changesheet(sheet: any) {
+    this.selectedSheet = sheet;
   }
+  yangiVaraq() {
+    this.sheets.push({
+      name: 'sheet' + (this.sheets.length + 1),
+      data: new Array(20).fill(new Array(20).fill('', 0, 20), 0, 20)
+    });
+    this.selectedSheet = this.sheets[this.sheets.length - 1]
+  }
+
+  seperate(ab: any) {
+    this.sheets = [];
+
+    this.selectedWB = XLSX.read(ab);
+    for (let sh of this.selectedWB.SheetNames) {
+      this.sheets.push({
+        name: sh,
+        data: <any>(XLSX.utils.sheet_to_json(this.selectedWB.Sheets[sh], { header: 1 }))
+      })
+    };
+
+    this.selectedSheet = this.sheets[0];
+  }
+
+
   ozgarish(changes: any, source: any): any {
-    this.ready = false;
+
+    console.log(source);
 
 
     return changes;
   }
   check() {
-    console.log(this.dataSource)
+    if (this.checking) return;
+    this.checking = true;
+    let errors: string[] = [];
+    // 1-maydonni tekshirish
+    const d = this.selectedSheet?.data;
+    const qatorSon = d.length;
+    const ustunSon = d[0].length;
+    if ((d[0][0] + '').toUpperCase() != 'TJF') {
+      errors.push(`A1 (${d[0][0]}) - 'TJF' bo'lishi shart: `);
+    }
+    if ((d[1][0] + '').toUpperCase() != 'TON') {
+      errors.push(`A2 (${d[1][0]}) - 'TON' bo'lishi shart`);
+    }
+    if ((d[1][ustunSon - 1] + '').toUpperCase() != 'SINF') {
+      errors.push(`${this.numberToMark(ustunSon)}2 (${d[1][ustunSon - 1]}) - 'SINF' bo'lishi shart`);
+    }
+    for (let i = 2; i < ustunSon - 1; i++) {
+      if (!(+d[0][i] == 0 || +d[0][i] == 1)) {
+        errors.push(`${this.numberToMark(i + 1)}1 (${d[0][i]}) - 0(nominal) yoki 1(miqdoriy) sonlaridan biri bo'lishi shart`);
+      }
+    }
+
+
+    if (!(+d[0][ustunSon - 1] > 0)) {
+      errors.push(`${this.numberToMark(ustunSon)}1 (${d[0][ustunSon - 1]}) - sinflar soni 0 dan katta bo'lishi shart`);
+    }
+
+    for (let i = 2; i < ustunSon; i++) {
+      if (d[0][i] == 1) {
+        for (let j = 2; j < qatorSon; j++) {
+          if (!d[j][i] ||  isNaN(+d[j][i])) {
+            errors.push(`${this.numberToMark(i + 1)}${j + 1} (${d[j][i]}) - son bo'lishi shart`);
+          }
+        }
+      } else {
+        for (let j = 2; j < qatorSon; j++) {
+          if (!d[j][i]) {
+            errors.push(`${this.numberToMark(i + 1)}${j + 1} (${d[j][i]}) - bo'sh bo'lmasligi shart`);
+          }
+        }
+      }
+
+    }
+
+
+
+
+    if (errors.length > 0) {
+      this.xatoXabar(errors)
+    } else {
+      this.setStep(1);
+    }
+    this.checking = false;
+
+  }
+  startCalculation() {
+
+  }
+
+  xatoXabar(errors: string[]) {
+    this.dialog.open(Dialog, {
+      data: errors
+    });
+  }
+  numberToMark(num: number) {
+    if (1 <= num && num <= 26) {
+      return String.fromCharCode(64 + num);
+    } else if (num >= 26) {
+      return String.fromCharCode(64 + Math.floor(num / 26)) + String.fromCharCode(64 + Math.floor(num % 26))
+    }
+    return '-';
   }
 
 }
-
-
-

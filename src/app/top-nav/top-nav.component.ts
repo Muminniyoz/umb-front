@@ -24,7 +24,7 @@ export class TopNavComponent implements OnInit, AfterViewInit {
     public activatedroute: ActivatedRoute, public accountService: AccountService,
     private translate: TranslateService) { }
   ngAfterViewInit(): void {
-    this.changeLang(this.translate.currentLang)
+  
   }
 
   ngOnInit() {
@@ -46,7 +46,7 @@ export class TopNavComponent implements OnInit, AfterViewInit {
          return event;
       }
       );
-      
+      this.changeLang(this.translate.currentLang)
   }
 
   toggleSidebar() {

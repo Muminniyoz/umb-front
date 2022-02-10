@@ -1,4 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~handsontable/dist/handsontable.full.css';
+@import '~@angular/material/theming';
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;  }
+
+$light: white;
+
+
+.light {
+    color: white;
+}
+.mat-form-field-infix{
+    width: auto!important;
+}
+.mat-expansion-panel-body{
+    padding: 0px 5px 16px!important;
+}

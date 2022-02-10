@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { MediaChange, MediaObserver } from '@angular/flex-layout';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 import { AccountService } from './core/account.service';
 
@@ -16,8 +17,15 @@ export class AppComponent implements OnInit, OnDestroy {
   toolBarHeight = 64;
   private readonly mediaWatcher: Subscription;
   rsideNavOpened: boolean = false;
+  
 
-  constructor(media: MediaObserver, private router: Router, public accountService: AccountService) {
+  constructor(media: MediaObserver, private router: Router, public accountService: AccountService, ) {
+    // translate.addLangs(['en', 'uz-Lat', 'uz-Cyrl', 'ru']);
+    // translate.use('en');
+    // translate.use('uz-Lat');
+    // translate.use('uz-Cyrl');
+    // translate.use('ru');
+  
     this.mediaWatcher = media.media$.subscribe((change: MediaChange) => {
       if (change.mqAlias === 'sm' || change.mqAlias === 'xs') {
         if (this.sideNavOpened) {

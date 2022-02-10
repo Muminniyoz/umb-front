@@ -12,6 +12,7 @@ import { UmbComponent } from './umb/umb.component';
 import { SharedModule } from '../shared/shared.module';
 import { HotTableComponent, HotTableModule } from '@handsontable/angular';
 import { registerAllModules } from 'handsontable/registry';
+import { Dialog } from './umb/dialog.component';
 
 // register Handsontable's modules
 registerAllModules();
@@ -19,7 +20,8 @@ registerAllModules();
 @NgModule({
   declarations: [
     HomeComponent,
-    UmbComponent
+    UmbComponent,
+    Dialog
  
   ],
   imports: [
@@ -28,15 +30,9 @@ registerAllModules();
     CoreModule,
     SharedModule,
     HotTableModule,
+    TranslateModule
 
-    TranslateModule.forRoot({
-      defaultLanguage: localStorage.getItem('lang') ?? 'ru',
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient]
-      }
-    })
+   
   ],
   bootstrap: [HomeComponent]
 })

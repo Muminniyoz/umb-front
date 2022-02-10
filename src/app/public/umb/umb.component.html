@@ -1,58 +1,119 @@
-<mat-stepper [linear]="isLinear" #stepper>
-    <mat-step [stepControl]="firstFormGroup">
-        <form [formGroup]="firstFormGroup">
-            <ng-template matStepLabel>Execel faylni tuklang</ng-template>
-            <div class="binary">
-                <span>
-                    Faylni tanlang:
-                    <input class="form-control" formControlName="firstCtrl" type="file" (change)="onFileChange($event)"
-                        multiple="false" />
-                </span>
-                <div>
-                    <button mat-raised-button (click)="namunaYuklash()" id="toggle-linear">
-                        Na'muna fayl yuklash
-                    </button>
-                    <button mat-raised-button (click)="reset()" id="toggle-linear">
-                        Reset
-                    </button>
-                </div>
+<mat-accordion class="example-headers-align">
+    <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
+        <mat-expansion-panel-header>
+            <mat-panel-title >
+                Ma'lumotlarni yuklash
+            </mat-panel-title>
+            <mat-panel-description>
+                Exel fayl yuklang yoki to'ldiring
+                <mat-icon>text_fields</mat-icon>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
 
-            </div>
-            <hr>
 
-            <div class="table-first">
-                <div>
-                    <hot-table [data]="dataSource" [settings]="hotSettings"></hot-table>
-                </div>
-            </div>
+
+        <div class="binary">
+            <span>
+                <button mat-raised-button (click)="inpFile.click()">
+                    <mat-icon class="mat-18">file_upload</mat-icon>
+                    Fayl yuklash
+                </button>
+                <button mat-raised-button (click)="saqlash()">
+                    <mat-icon class="mat-18">save</mat-icon>
+                    Saqlash
+                </button>
+                <input #inpFile hidden class="form-control"  type="file"
+                    (change)="onFileChange($event)" multiple="false" />
+            </span>
             <div>
-                <mat-select (selectionChange)="changesheet($event.value)" placeholder="Sheets">
-                    <mat-option *ngFor="let sh of sheets" [value]="sh">{{sh}}</mat-option>
-                </mat-select>
-
-                <button mat-raised-button color="primary" (click)="yuklash()">Yuklash</button>
-                <button mat-raised-button color="primary" (click)="check()">Tekshirish</button>
-                <button mat-raised-button color="primary" [disabled]="!ready" matStepperNext>Keyingisi</button>
+                <button matTooltip="Na'muna fayl yuklash" mat-button (click)="namunaYuklash()" id="toggle-linear">
+                    <mat-icon class="mat-18">file_download</mat-icon>
+                </button>
+                <!-- <button mat-raised-button (click)="reset()" id="toggle-linear">
+                    Reset
+                </button> -->
             </div>
-        </form>
-    </mat-step>
-    <mat-step label="Fill out your address">
-
-
-
-
-        <div>
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button matStepperNext>Next</button>
         </div>
-
-    </mat-step>
-    <mat-step>
-        <ng-template matStepLabel>Done</ng-template>
-        <p>You are now done.</p>
+        <hr>
         <div>
-            <button mat-button matStepperPrevious>Back</button>
-            <button mat-button (click)="stepper.reset()">Reset</button>
+
+            <hot-table class="table-first" height="58vh" [data]="selectedSheet?.data" [settings]="hotSettings">
+            </hot-table>
+
         </div>
-    </mat-step>
-</mat-stepper>
+        <hr>
+
+
+
+
+
+        <mat-action-row>
+
+
+            <mat-form-field appearance="outline">
+                <mat-label>Varaq:</mat-label>
+                <mat-select [value]="selectedSheet" (selectionChange)="changesheet($event.value)" placeholder="Varaqni tanlang . . .">
+                    <mat-option *ngFor="let sh of sheets" [value]="sh">{{sh.name}}</mat-option>
+                    <mat-option (click)="yangiVaraq()">
+                        <mat-icon class="mat-18">add</mat-icon> yangi varaq
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+
+
+            <button mat-raised-button style="height: fit-content;" color="primary" (click)="check()">
+                <mat-icon *ngIf="!checking" class="mat-18">keyboard_arrow_right</mat-icon>
+                <mat-progress-spinner *ngIf="checking" style="display: inline-block;" mode="indeterminate" diameter="25"
+                    color="warn"></mat-progress-spinner>
+                Boshlash
+            </button>
+
+        </mat-action-row>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [disabled]="step < 1" [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+              Hisoblash sozlamalari
+            </mat-panel-title>
+            <mat-panel-description>
+                Hisoblash sozlamalarini belgilang va boshlang
+                <mat-icon>settings</mat-icon>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <mat-form-field appearance="fill">
+            <mat-label>Hisoblash algoritmi</mat-label>
+           <mat-select [(value)]="tanlanganAlgoritm" placeholder="">
+               <mat-option value="1">Evrestik algoritm</mat-option>
+           </mat-select>
+        </mat-form-field>
+        <button mat-button (click)="startCalculation()">Start</button>
+
+        <mat-action-row>
+            <button mat-button color="warn" (click)="prevStep()">Orqaga</button>
+            <button mat-button color="primary" (click)="nextStep()">Hisoblash</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel [disabled]="step < 2" [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+               Modelni tahlil qilish
+            </mat-panel-title>
+            <mat-panel-description>
+               Hozil bo'lgan modelnit testlash
+                <mat-icon>check</mat-icon>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        
+
+        <mat-action-row>
+            <button mat-button color="warn" (click)="prevStep()">Previous</button>
+            <button mat-button color="primary" (click)="nextStep()">End</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+
+</mat-accordion>

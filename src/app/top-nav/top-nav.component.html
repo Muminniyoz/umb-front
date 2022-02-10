@@ -3,7 +3,8 @@
     <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
   </button>
   <div class="nav-brand">
-    {{title}}
+    {{"home.title"|translate}}
+
   </div>
   <span class="nav-spacer"></span>
   <button style="overflow: hidden;" mat-button [matMenuTriggerFor]="menu">
@@ -27,20 +28,10 @@
       <input matInput placeholder="Qidiruv . . .">
     </mat-form-field>
   </form> -->
-  <ng-container>
-    <!-- <a href="https://app.jivosite.com/chat/inbox" target="_blank" mat-icon-button>
-      <mat-icon class="mat-18">email</mat-icon>
-    </a> -->
+  
     <button [matMenuTriggerFor]="profile" mat-icon-button>
       <mat-icon>account_circle</mat-icon>
     </button>
-
-
-
-  </ng-container>
-
-
-
   <mat-menu #profile="matMenu" [overlapTrigger]="false">
     <ng-container *ngIf="authenticated">
       <button mat-menu-item  [routerLink]="['/admin/profil']">
