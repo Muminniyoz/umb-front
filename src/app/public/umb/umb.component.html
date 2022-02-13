@@ -90,7 +90,11 @@
            </mat-select>
         </mat-form-field>
         <button mat-button (click)="startCalculation()">Start</button>
-
+      <div *ngIf="progress">
+          <p>Progress: {{progressValue}}%</p>
+             <mat-progress-bar  mode="determinate" [value]="progressValue" color="primary"></mat-progress-bar>
+     
+      </div>
         <mat-action-row>
             <button mat-button color="warn" (click)="prevStep()">Orqaga</button>
             <button mat-button color="primary" (click)="nextStep()">Hisoblash</button>

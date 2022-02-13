@@ -2,8 +2,7 @@
   <div class="content px20">
     <form class="login-form" [formGroup]='loginForm' (ngSubmit)="onLogin()">
       <div class="text-center">
-        <h1 class="app-name">BTCWMZ.UZ
-
+        <h1 class="app-name"> PRODON
         </h1>
         <h2> Tizimga kirish</h2>
       </div>
@@ -29,6 +28,7 @@
         </div>
 
         <div fxFlexFill fxFlexFil.lg='6'>
+          <a class="mt-5" [routerLink]="['register']" color="secondary" class="w-50">Ro'yxatdan o'tish</a> <br>
           <a class="mt-5" [routerLink]="['/']" color="secondary" class="w-50">Bosh sahifaga qaytish</a>
         </div>
       </div>

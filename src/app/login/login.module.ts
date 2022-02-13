@@ -14,6 +14,7 @@ import { MaterialModule } from '../shared/material/material.module';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { SharedModule } from '../shared/shared.module';
+import { RegisterComponent } from './register/register.component';
 
 @NgModule({
   imports: [
@@ -28,6 +29,6 @@ import { SharedModule } from '../shared/shared.module';
   
 
   ],
-  declarations: [LoginComponent]
+  declarations: [LoginComponent, RegisterComponent]
 })
 export class LoginModule {}

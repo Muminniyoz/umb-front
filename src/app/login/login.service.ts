@@ -12,6 +12,7 @@ import { JwtUtil } from '../core/jwt.util';
 export class LoginService {
 
 
+
   api = environment.baseUrl+"/api/account" ;
 
   constructor(public jwtUtil: JwtUtil, public http: HttpClient, public accountService: AccountService) { }
@@ -30,5 +31,13 @@ export class LoginService {
   logout(): void {
     this.jwtUtil.clear();
     this.accountService.authenticate(null);
+  }
+  register(register: any):  Observable<any> {
+    return this.http.post<any>(this.api + "/register", register)
+    .pipe( map((token)=>{     
+        this.jwtUtil.save(token.token, register.rememberMe);
+        this.accountService.identity(true);
+      })
+    );
   }
 }

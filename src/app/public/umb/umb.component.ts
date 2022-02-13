@@ -1,10 +1,10 @@
 import { HttpClient } from '@angular/common/http';
-import { AfterViewChecked, AfterViewInit, Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import Handsontable from 'handsontable';
-import { createSpreadsheetData } from 'handsontable/helpers';
-import { Subject, SubjectSubscriber } from 'rxjs/internal/Subject';
+import { Subject } from 'rxjs/internal/Subject';
+
 import * as XLSX from 'xlsx';
 import { Dialog } from './dialog.component';
 @Component({
@@ -34,6 +34,8 @@ export class UmbComponent implements OnInit, AfterViewInit {
     afterChangesObserved: this.check
   };
   checking: boolean = false;
+  progressValue: number = 0;
+  progress: boolean = false;
   ;
   step = 0;
 
@@ -89,7 +91,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
 
   }
   onFileChange(evt: any) {
-    console.log(evt);
+
 
     /* wire up file reader */
     const target: DataTransfer = <DataTransfer>(evt.target);
@@ -98,7 +100,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
     const reader: FileReader = new FileReader();
     reader.onload = (e: any) => {
       /* read workbook */
-      console.log(e);
+
       const ab: ArrayBuffer = e.target.result;
       this.seperate(ab);
 
@@ -136,69 +138,74 @@ export class UmbComponent implements OnInit, AfterViewInit {
 
 
   ozgarish(changes: any, source: any): any {
-
-    console.log(source);
-
-
+   
     return changes;
   }
+
   check() {
     if (this.checking) return;
+
     this.checking = true;
-    let errors: string[] = [];
-    // 1-maydonni tekshirish
-    const d = this.selectedSheet?.data;
-    const qatorSon = d.length;
-    const ustunSon = d[0].length;
-    if ((d[0][0] + '').toUpperCase() != 'TJF') {
-      errors.push(`A1 (${d[0][0]}) - 'TJF' bo'lishi shart: `);
-    }
-    if ((d[1][0] + '').toUpperCase() != 'TON') {
-      errors.push(`A2 (${d[1][0]}) - 'TON' bo'lishi shart`);
-    }
-    if ((d[1][ustunSon - 1] + '').toUpperCase() != 'SINF') {
-      errors.push(`${this.numberToMark(ustunSon)}2 (${d[1][ustunSon - 1]}) - 'SINF' bo'lishi shart`);
-    }
-    for (let i = 2; i < ustunSon - 1; i++) {
-      if (!(+d[0][i] == 0 || +d[0][i] == 1)) {
-        errors.push(`${this.numberToMark(i + 1)}1 (${d[0][i]}) - 0(nominal) yoki 1(miqdoriy) sonlaridan biri bo'lishi shart`);
-      }
-    }
+
+    if (typeof Worker !== 'undefined') {
+      // Create a new
+      const worker = new Worker(new URL('./check.worker', import.meta.url));
+      worker.onmessage = ({ data }) => {
+    
+
+        let errors = data;
+        if (errors.length > 0) {
+          this.xatoXabar(errors)
+        } else {
+          this.setStep(1);
+                }
+        this.checking = false;
+
+      };
+      worker.onerror = (data: any) => {
 
 
-    if (!(+d[0][ustunSon - 1] > 0)) {
-      errors.push(`${this.numberToMark(ustunSon)}1 (${d[0][ustunSon - 1]}) - sinflar soni 0 dan katta bo'lishi shart`);
-    }
+        this.checking = false;
+      };
 
-    for (let i = 2; i < ustunSon; i++) {
-      if (d[0][i] == 1) {
-        for (let j = 2; j < qatorSon; j++) {
-          if (!d[j][i] ||  isNaN(+d[j][i])) {
-            errors.push(`${this.numberToMark(i + 1)}${j + 1} (${d[j][i]}) - son bo'lishi shart`);
-          }
-        }
-      } else {
-        for (let j = 2; j < qatorSon; j++) {
-          if (!d[j][i]) {
-            errors.push(`${this.numberToMark(i + 1)}${j + 1} (${d[j][i]}) - bo'sh bo'lmasligi shart`);
-          }
-        }
-      }
+      worker.postMessage(this.selectedSheet.data)
 
-    }
-
-
-
-
-    if (errors.length > 0) {
-      this.xatoXabar(errors)
     } else {
-      this.setStep(1);
+      // Web workers are not supported in this environment.
+      // You should add a fallback so that your program still executes correctly.
     }
-    this.checking = false;
 
   }
   startCalculation() {
+    this.progress = true;
+    if (typeof Worker !== 'undefined') {
+      // Create a new
+      const worker = new Worker(new URL('./progress.worker', import.meta.url));
+      worker.onmessage = (msg)=>{
+      
+        const data = msg.data;
+        switch (data.type) {
+          case 'progress': this.progressValue += data.data; break;
+          case 'error': {
+            this.progress = false;
+          } break;
+          case 'finished': {
+            this.progress = false;
+          } break;
+        }
+  
+      };
+      worker.onerror = (error)=>{
+
+      }
+      worker.postMessage(this.selectedSheet.data)
+    } else {
+      // xatolikk
+    }
+
+  
+
+
 
   }
 
