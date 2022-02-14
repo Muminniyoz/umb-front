@@ -1,7 +1,7 @@
 <mat-accordion class="example-headers-align">
     <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle>
         <mat-expansion-panel-header>
-            <mat-panel-title >
+            <mat-panel-title>
                 Ma'lumotlarni yuklash
             </mat-panel-title>
             <mat-panel-description>
@@ -22,8 +22,8 @@
                     <mat-icon class="mat-18">save</mat-icon>
                     Saqlash
                 </button>
-                <input #inpFile hidden class="form-control"  type="file"
-                    (change)="onFileChange($event)" multiple="false" />
+                <input #inpFile hidden class="form-control" type="file" (change)="onFileChange($event)"
+                    multiple="false" />
             </span>
             <div>
                 <button matTooltip="Na'muna fayl yuklash" mat-button (click)="namunaYuklash()" id="toggle-linear">
@@ -52,16 +52,14 @@
 
             <mat-form-field appearance="outline">
                 <mat-label>Varaq:</mat-label>
-                <mat-select [value]="selectedSheet" (selectionChange)="changesheet($event.value)" placeholder="Varaqni tanlang . . .">
+                <mat-select [value]="selectedSheet" (selectionChange)="changesheet($event.value)"
+                    placeholder="Varaqni tanlang . . .">
                     <mat-option *ngFor="let sh of sheets" [value]="sh">{{sh.name}}</mat-option>
                     <mat-option (click)="yangiVaraq()">
                         <mat-icon class="mat-18">add</mat-icon> yangi varaq
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-
-
-
             <button mat-raised-button style="height: fit-content;" color="primary" (click)="check()">
                 <mat-icon *ngIf="!checking" class="mat-18">keyboard_arrow_right</mat-icon>
                 <mat-progress-spinner *ngIf="checking" style="display: inline-block;" mode="indeterminate" diameter="25"
@@ -75,7 +73,7 @@
     <mat-expansion-panel [disabled]="step < 1" [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
         <mat-expansion-panel-header>
             <mat-panel-title>
-              Hisoblash sozlamalari
+                Hisoblash sozlamalari
             </mat-panel-title>
             <mat-panel-description>
                 Hisoblash sozlamalarini belgilang va boshlang
@@ -85,16 +83,16 @@
 
         <mat-form-field appearance="fill">
             <mat-label>Hisoblash algoritmi</mat-label>
-           <mat-select [(value)]="tanlanganAlgoritm" placeholder="">
-               <mat-option value="1">Evrestik algoritm</mat-option>
-           </mat-select>
+            <mat-select [(value)]="tanlanganAlgoritm" placeholder="">
+                <mat-option value="1">Evrestik algoritm</mat-option>
+            </mat-select>
         </mat-form-field>
         <button mat-button (click)="startCalculation()">Start</button>
-      <div *ngIf="progress">
-          <p>Progress: {{progressValue}}%</p>
-             <mat-progress-bar  mode="determinate" [value]="progressValue" color="primary"></mat-progress-bar>
-     
-      </div>
+        <div *ngIf="progress">
+            <p>Progress: {{progressValue}}%</p>
+            <mat-progress-bar mode="determinate" [value]="progressValue" color="primary"></mat-progress-bar>
+
+        </div>
         <mat-action-row>
             <button mat-button color="warn" (click)="prevStep()">Orqaga</button>
             <button mat-button color="primary" (click)="nextStep()">Hisoblash</button>
@@ -104,16 +102,18 @@
     <mat-expansion-panel [disabled]="step < 2" [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
         <mat-expansion-panel-header>
             <mat-panel-title>
-               Modelni tahlil qilish
+                Modelni tahlil qilish
             </mat-panel-title>
             <mat-panel-description>
-               Hozil bo'lgan modelnit testlash
+                Hozil bo'lgan modelnit testlash
                 <mat-icon>check</mat-icon>
             </mat-panel-description>
         </mat-expansion-panel-header>
-
-        
-
+        <hr>
+        <div>
+            <hot-table class="table-first" height="58vh" [data]="result" [settings]="hotSettings1">
+            </hot-table>
+        </div>
         <mat-action-row>
             <button mat-button color="warn" (click)="prevStep()">Previous</button>
             <button mat-button color="primary" (click)="nextStep()">End</button>

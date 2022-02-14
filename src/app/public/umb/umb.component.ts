@@ -3,7 +3,7 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import Handsontable from 'handsontable';
-import { Subject } from 'rxjs/internal/Subject';
+import { Subject } from 'rxjs';
 
 import * as XLSX from 'xlsx';
 import { Dialog } from './dialog.component';
@@ -33,11 +33,35 @@ export class UmbComponent implements OnInit, AfterViewInit {
     afterChange: this.ozgarish,
     afterChangesObserved: this.check
   };
+  hotSettings1: Handsontable.GridSettings = {
+    colHeaders: true,
+    rowHeaders: true,
+    contextMenu: true,
+    height: 'auto',
+    licenseKey: 'non-commercial-and-evaluation',
+    afterChange: this.ozgarish,
+    afterChangesObserved: this.check
+  };
   checking: boolean = false;
   progressValue: number = 0;
   progress: boolean = false;
+  result: any[] = Array(20).fill(Array(20).fill('', 0, 20), 0, 20);
   ;
   step = 0;
+
+
+
+
+  constructor(
+    private _formBuilder: FormBuilder,
+    private http: HttpClient,
+    private dialog: MatDialog
+  ) { }
+
+  ngOnInit() {
+
+  }
+
 
   setStep(index: number) {
     this.step = index;
@@ -51,24 +75,6 @@ export class UmbComponent implements OnInit, AfterViewInit {
     this.step--;
   }
 
-
-
-
-  constructor(
-    private _formBuilder: FormBuilder,
-    private http: HttpClient,
-    private dialog: MatDialog
-  ) { }
-
-  ngOnInit() {
-
-    this.http.get('assets/template/ProDon- UMB - example file.xlsx', { responseType: 'arraybuffer' }).subscribe(data => {
-      this.seperate(data);
-    },
-      error => {
-        this.yangiVaraq();
-      })
-  }
   saqlash() {
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     for (let sh of this.sheets) {
@@ -88,6 +94,12 @@ export class UmbComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
 
+    this.http.get('assets/template/ProDon- UMB - example file.xlsx', { responseType: 'arraybuffer' }).subscribe(data => {
+      this.seperate(data);
+    },
+      error => {
+        this.yangiVaraq();
+      });
 
   }
   onFileChange(evt: any) {
@@ -126,45 +138,40 @@ export class UmbComponent implements OnInit, AfterViewInit {
     this.sheets = [];
 
     this.selectedWB = XLSX.read(ab);
+
     for (let sh of this.selectedWB.SheetNames) {
+      let data = <any>(XLSX.utils.sheet_to_json(this.selectedWB.Sheets[sh], { header: 1, rawNumbers: false }));
+
       this.sheets.push({
         name: sh,
-        data: <any>(XLSX.utils.sheet_to_json(this.selectedWB.Sheets[sh], { header: 1 }))
-      })
+        data: data
+      });
     };
-
     this.selectedSheet = this.sheets[0];
   }
-
-
   ozgarish(changes: any, source: any): any {
-   
     return changes;
   }
-
   check() {
     if (this.checking) return;
-
     this.checking = true;
 
     if (typeof Worker !== 'undefined') {
       // Create a new
       const worker = new Worker(new URL('./check.worker', import.meta.url));
       worker.onmessage = ({ data }) => {
-    
+
 
         let errors = data;
         if (errors.length > 0) {
           this.xatoXabar(errors)
         } else {
           this.setStep(1);
-                }
+        }
         this.checking = false;
 
       };
       worker.onerror = (data: any) => {
-
-
         this.checking = false;
       };
 
@@ -173,6 +180,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
     } else {
       // Web workers are not supported in this environment.
       // You should add a fallback so that your program still executes correctly.
+
     }
 
   }
@@ -181,29 +189,34 @@ export class UmbComponent implements OnInit, AfterViewInit {
     if (typeof Worker !== 'undefined') {
       // Create a new
       const worker = new Worker(new URL('./progress.worker', import.meta.url));
-      worker.onmessage = (msg)=>{
-      
+      worker.onmessage = (msg) => {
+
         const data = msg.data;
         switch (data.type) {
           case 'progress': this.progressValue += data.data; break;
           case 'error': {
             this.progress = false;
           } break;
-          case 'finished': {
+          case 'success': {
             this.progress = false;
+            this.result = data.data;
+            console.log(this.result);
+
+            this.setStep(2);
           } break;
         }
-  
+
       };
-      worker.onerror = (error)=>{
+      worker.onerror = (error) => {
 
       }
       worker.postMessage(this.selectedSheet.data)
     } else {
       // xatolikk
+      this.dialog.open(ShowDialog);
     }
 
-  
+
 
 
 
@@ -223,4 +236,12 @@ export class UmbComponent implements OnInit, AfterViewInit {
     return '-';
   }
 
+}
+
+@Component({
+  template: `<h2>Sizning brouzeringiz hisob kitob uchun yaroqli emas!<br>
+  Ilimos boshqa brauzerdan kiring</h2>`
+})
+class ShowDialog {
+  constructor() { }
 }

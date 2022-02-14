@@ -1,14 +1,12 @@
 /// <reference lib="webworker" />
-
+import { Subject } from "rxjs";
 addEventListener('message', ({ data }) => {
-
-
   UMB.start(data).subscribe((d) => {
     postMessage(d);
   });
 });
 
-import { Subject } from "rxjs";
+
 interface Record {
   u11: number;
   u12: number;
@@ -53,6 +51,8 @@ class UMB {
   static rs: Record1[] | any[] = [];
   static rm: Record1 | any;
 
+  // natijalarni yozib olish uchun
+  static result: any[] = [];
 
 
 
@@ -81,12 +81,6 @@ class UMB {
     this.sohaNom = d[0][1];
     // birinchi qator
     let mas: any[] = [];
-
-
-
-
-
-
     mas.push([]);
     // alomatlarni o'qib olish
     for (let i = 0; i < m - 3; i++) {
@@ -106,25 +100,16 @@ class UMB {
       for (let j = 2; j < m - 1; j++) {
         mas[i - 1][j - 2] = d[i][j];
       }
-
-
       // sinflar o'qib olinmoqdakl
       this.obyektSinflar[i - 2] = (d[i][m - 1] + "").trim();
-
-
-
     }
 
     // a massiv bo'yicha
     this.m -= 3;
     this.n -= 2;
     this.a = mas;
- 
-
-
-    this.changeProgress(1);
     this.sinflarniSanash();
-    this.changeProgress(1);
+
 
     for (let al = 0; al < m; al++) {
 
@@ -134,27 +119,79 @@ class UMB {
         this.nominal(al);
       }
     }
-    console.log('avval', this.R);
-    this.R.sort((a, b) => a.w - b.w);
-    console.log('keyin', this.R);
+    this.R.sort((a, b) => b.w - a.w);
 
 
+
+    for (let i = 0; i < this.n; i++) {
+      this.ax.push([]);
+    }
+    for (let i = 0; i < 4; i++) {
+      this.cc.push([]);
+    }
     // hisoblash
-    for(let al = 0; al<m; al++){
-      if(mas[0][1] == 1){
-        miqdoriy([-1, 1][Math.floor(Math.random()*2)]);
+    for (let al = 0; al < this.m; al++) {
+      if (mas[0][al] == 1) {
+
+        this.miqdoriy(al, [-1, 1][Math.floor(Math.random() * 2)]);
       }
     }
 
 
+    // natijani yozish
+
+    this.result.push(Array(10).fill('', 0, 10));
+    this.result[0][0] = "Natija";
+    this.result.push([]);
+    this.result.push(["Alomatlar hissasi"]);
+    this.result.push(['№', 'Alomat', 'c0', 'c1', 'c2', 'Alomat vazni']);
+    for (let i = 0; i < this.m; i++) {
+      this.result.push([i + 1, this.alomatNomlar[this.R[i].k], this.R[i].c0, this.R[i].c1, this.R[i].c2, this.R[i].w]);
+    }
+
+    // R(S) ni hisoblash
+    this.RotS();
+
+    this.subject$.next({
+      type: 'success',
+      data: this.result
+    })
 
 
 
 
 
+  }
+
+  // R(S) jadvalini hosil qilish
+  static RotS() {
+    let c = [];
+    for (let i = 0; i < this.n; i++) {
+      let s = 0;
+      for (let j = 0; j < this.m; j++) {
+        s += this.ax[i][j];
+      }
+      this.ax[i][0] = s;
+      c[i] = s;
+
+    }
+    console.log(c);
+
+    console.table(this.ax);
+
+  }
+  static miqdoriy(al: number, ti: number) {
+    this.ax[0][al + 1] = ti;
 
 
+    let w = ti * this.cc[3][al];
+    let p = this.cc[2][al] - this.cc[0][al];
 
+    for (let i = 1; i < this.n; i++) {
+      this.ax[i][al + 1] = w * (this.a[i][al] - this.cc[1][al]) / p;
+      // console.log(i, ti,  w, p, (this.a[i][al] - this.cc[1][al]), this.ax[i][al]);
+
+    }
 
   }
   // nominal ustunlarni hisoblahs
@@ -167,16 +204,16 @@ class UMB {
 
     let col = [];
     let cd = [];
-    for (let i = 1; i <= this.n; i++) {
+    for (let i = 1; i < this.n; i++) {
       col[i - 1] = this.a[i][al];
     }
-   
+
 
     col.sort((a, b) => b - a);
 
     cd = [...new Set(col)];
-    
-    
+
+
     let x = cd.length - 1;
     // yagonaQiymatlar[0] = tanlanganUstun[0];
 
@@ -213,30 +250,35 @@ class UMB {
       }
 
     }
-    
+
     this.R[al].k = al;
     this.R[al].c0 = cd[x];
     this.R[al].c1 = c1;
     this.R[al].c2 = cd[0];
     this.R[al].w = max;
+
+    this.cc[0][al] = this.R[al].c0;
+    this.cc[1][al] = this.R[al].c1;
+    this.cc[2][al] = this.R[al].c2;
+    this.cc[3][al] = this.R[al].w;
   }
   static wmax(al: number, c1: number) {
-    
+
     let u = [
       [0, 0, 0],
       [0, 0, 0],
       [0, 0, 0],
     ];
     // U larni hisoblash
-    for (let i1 = 0; i1 < this.n; i1++) {
+    for (let i1 = 0; i1 < this.n - 1; i1++) {
       if (this.obyektSinflar[i1] == this.sinfTurlar[0]) {
-        if (this.a[i1][al] <= c1) {
+        if (this.a[i1 + 1][al] <= c1) {
           u[1][1]++;
         } else {
           u[1][2]++;
         }
       } else if (this.obyektSinflar[i1] == this.sinfTurlar[1]) {
-        if (this.a[i1][al] <= c1) {
+        if (this.a[i1 + 1][al] <= c1) {
           u[2][1]++;
         } else {
           u[2][2]++;
@@ -283,11 +325,7 @@ class UMB {
       this.sinfAzoSon[t] = 0;
     }
 
-
-
-
-
-    for (let i = 1; i < this.n; i++) {
+    for (let i = 0; i < this.n; i++) {
       this.sinfAzoSon[this.obyektSinflar[i]]++;
     }
 
@@ -299,9 +337,4 @@ class UMB {
       data: this.allWork / 100 * value
     });
   }
-}
-
-function miqdoriy(t: number) {
-    console.log(t);
-    
 }
