@@ -1,3 +1,5 @@
+// check.worker.ts
+
 /// <reference lib="webworker" />
 
 addEventListener('message', ({ data }) => {
@@ -5,7 +7,7 @@ addEventListener('message', ({ data }) => {
   // 1-maydonni tekshirish
   const d = data;
 
-  
+    
   const qatorSon = d.length;
   const ustunSon = d[0].length;
   if ((d[0][0] + '').toUpperCase() != 'TJF') {
@@ -22,10 +24,6 @@ addEventListener('message', ({ data }) => {
       errors.push(`${numberToMark(i + 1)}1 (${d[0][i]}) - 0(nominal) yoki 1(miqdoriy) sonlaridan biri bo'lishi shart`);
     }
   }
-
-
-
-
   const kodlar = new Set()
   for (let i = 2; i < qatorSon; i++) {
     kodlar.add(d[i][0]);
@@ -36,7 +34,6 @@ addEventListener('message', ({ data }) => {
   if (kodlar.size < qatorSon - 2) {
     errors.push(`Obyekt kodilarini tekshiring ular bir xil bo'lmasligi zarur`);
   }
-
 
   if (!(+d[0][ustunSon - 1] > 0)) {
     errors.push(`${numberToMark(ustunSon)}1 (${d[0][ustunSon - 1]}) - sinflar soni 0 dan katta bo'lishi shart`);

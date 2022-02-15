@@ -1,3 +1,5 @@
+// progress.worker.ts
+
 /// <reference lib="webworker" />
 import { Subject } from "rxjs";
 addEventListener('message', ({ data }) => {

@@ -2,9 +2,7 @@ import { DOCUMENT } from '@angular/common';
 import { AfterViewInit, Component, Inject, OnInit, Renderer2 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
-import { HisobService } from 'src/app/shared/service/hisob.service';
 import { MessageTexts } from '../core/message-texts';
-import { TranzaksiyaService } from '../shared/service/tranzaksiya.service';
 
 
 
@@ -20,7 +18,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   siteLanguage: string = "";
   hisoblar: any;
 
-  constructor(private hisobService: HisobService, private transService: TranzaksiyaService, private _renderer2: Renderer2, @Inject(DOCUMENT) private _document: Document, private translate: TranslateService) { }
+  constructor(private _renderer2: Renderer2, @Inject(DOCUMENT) private _document: Document, private translate: TranslateService) { }
   ngAfterViewInit(): void {
   }
 
@@ -37,9 +35,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
       case 'uz-Cyrl': this.siteLanguage = "Ўзбек"; break;
       case 'ru': this.siteLanguage = "Русский"; break;
     }
-   
-
-
   }
  
   changeLang(lang: string) {
