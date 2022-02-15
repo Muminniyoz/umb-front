@@ -40,7 +40,11 @@
             "ngswConfigPath": "ngsw-config.json",
             "webWorkerTsConfig": "tsconfig.worker.json",
             "allowedCommonJsDependencies": [
-              "lodash"
+
+              "xlsx",
+              "pikaday",
+              "core-js",
+              "handsontable"
            ]
           },
           "configurations": {
