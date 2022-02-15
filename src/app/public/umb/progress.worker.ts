@@ -94,7 +94,7 @@ class UMB {
     this.sinfSon = d[0][m - 1];
 
     for (let i = 2; i < n; i++) {
-      // Har bir qatorda obyekt nomi o'qib olinmoqda 
+      // Har bir qatorda obyekt nomi o'qib olinmoqda
       this.obyektNomlar[i - 1] = d[i][1];
       // Har bir obyekt miqdorlari o'qib olinmoqda
 
@@ -112,6 +112,12 @@ class UMB {
     this.a = mas;
     this.sinflarniSanash();
 
+    for (let i = 0; i < this.n; i++) {
+      this.ax.push([]);
+    }
+    for (let i = 0; i < 4; i++) {
+      this.cc.push([]);
+    }
 
     for (let al = 0; al < m; al++) {
 
@@ -125,12 +131,7 @@ class UMB {
 
 
 
-    for (let i = 0; i < this.n; i++) {
-      this.ax.push([]);
-    }
-    for (let i = 0; i < 4; i++) {
-      this.cc.push([]);
-    }
+
     // hisoblash
     for (let al = 0; al < this.m; al++) {
       if (mas[0][al] == 1) {
