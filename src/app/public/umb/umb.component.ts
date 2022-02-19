@@ -187,6 +187,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
   }
   startCalculation() {
     this.progress = true;
+    this.progressValue = 0;
     if (typeof Worker !== 'undefined') {
       // Create a new
       const worker = new Worker(new URL('./progress.worker', import.meta.url));
@@ -195,7 +196,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
         const data = msg.data;
         switch (data.type) {
           case 'progress': {
-            this.progressValue += data.progress;
+            this.progressValue = data.progress;
             this.statusText = data.data;
           } break;
           case 'error': {

@@ -13,7 +13,7 @@ const routes: Routes = [
 
   },
  {
-        path: 'umb',
+        path: 'hisoblash',
         component: UmbComponent
       },
  {
