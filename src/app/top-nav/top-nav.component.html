@@ -2,14 +2,14 @@
   <button type="button" mat-icon-button (click)="toggleSidebar()">
     <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
   </button>
-    <img src="assets/icons/icon-72x72.png" alt="">
+  <img src="assets/icons/icon-72x72.png" alt="">
   <div class="nav-brand">
-  
+
     {{"home.title"|translate}}
 
   </div>
   <span class="nav-spacer"></span>
-  <button style="overflow: hidden;" mat-button [matMenuTriggerFor]="menu">
+  <!-- <button style="overflow: hidden;" mat-button [matMenuTriggerFor]="menu">
     <mat-icon>language</mat-icon> {{siteLanguage}}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>
@@ -22,7 +22,7 @@
       Ўзбек</button>
     <button mat-menu-item (click)="changeLang('ru')"><img src="assets/ru.svg" alt="ru flags">
       Русский</button>
-  </mat-menu>
+  </mat-menu> -->
 
 
   <!-- <form   class="hidden-sm" style="margin-right: 20px; margin-top: 8px">
@@ -30,13 +30,13 @@
       <input matInput placeholder="Qidiruv . . .">
     </mat-form-field>
   </form> -->
-  
-    <button [matMenuTriggerFor]="profile" mat-icon-button>
-      <mat-icon>account_circle</mat-icon>
-    </button>
+
+  <button [matMenuTriggerFor]="profile" mat-icon-button>
+    <mat-icon>account_circle</mat-icon>
+  </button>
   <mat-menu #profile="matMenu" [overlapTrigger]="false">
     <ng-container *ngIf="authenticated">
-      <button mat-menu-item  [routerLink]="['/admin/profil']">
+      <button mat-menu-item [routerLink]="['/admin/profil']">
         <mat-icon>person</mat-icon>
         <span>Profil</span>
       </button>
@@ -61,6 +61,6 @@
   </mat-menu>
 
 
- 
+
 
 </mat-toolbar>

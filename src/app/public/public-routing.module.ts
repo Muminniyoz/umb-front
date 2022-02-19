@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { HelpComponent } from './help/help.component';
 import { HomeComponent } from './home.component';
 import { UmbComponent } from './umb/umb.component';
 
@@ -14,6 +15,10 @@ const routes: Routes = [
  {
         path: 'umb',
         component: UmbComponent
+      },
+ {
+        path: 'help',
+        component: HelpComponent
       }
 
 ];

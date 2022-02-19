@@ -63,7 +63,7 @@ registerAllModules();
       registrationStrategy: 'registerWhenStable:30000'
     }),
     TranslateModule.forRoot({
-      defaultLanguage: localStorage.getItem('lang') ?? 'ru',
+      defaultLanguage: localStorage.getItem('lang') ?? 'uz-Lat',
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,

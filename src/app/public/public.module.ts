@@ -13,6 +13,7 @@ import { SharedModule } from '../shared/shared.module';
 import { HotTableComponent, HotTableModule } from '@handsontable/angular';
 import { registerAllModules } from 'handsontable/registry';
 import { Dialog } from './umb/dialog.component';
+import { HelpComponent } from './help/help.component';
 
 // register Handsontable's modules
 registerAllModules();
@@ -21,7 +22,8 @@ registerAllModules();
   declarations: [
     HomeComponent,
     UmbComponent,
-    Dialog
+    Dialog,
+    HelpComponent
  
   ],
   imports: [

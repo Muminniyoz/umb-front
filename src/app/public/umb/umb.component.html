@@ -82,42 +82,43 @@
             </mat-panel-description>
         </mat-expansion-panel-header>
 
-        <mat-form-field appearance="fill">
+        <!-- <mat-form-field appearance="fill">
             <mat-label>Hisoblash algoritmi</mat-label>
             <mat-select [(value)]="tanlanganAlgoritm" placeholder="">
                 <mat-option value="1">Evrestik algoritm</mat-option>
             </mat-select>
-        </mat-form-field>
-        <button mat-button (click)="startCalculation()">Start</button>
+        </mat-form-field> -->
+        <h2>Hisob kitib vaqti biroz vaqt oladi! Bu vaqt davomida boshqa sahifaga o'tmang!</h2>
+        <button mat-raised-button color="primary" (click)="startCalculation()">Hisob kitobni boshlash</button>
         <div *ngIf="progress">
-            <p>Progress: {{progressValue}}%</p>
+
+            <p>Progress: {{progressValue}}% / {{statusText}}</p>
+
             <mat-progress-bar mode="determinate" [value]="progressValue" color="primary"></mat-progress-bar>
 
         </div>
-        <mat-action-row>
-            <button mat-button color="warn" (click)="prevStep()">Orqaga</button>
-            <button mat-button color="primary" (click)="nextStep()">Hisoblash</button>
-        </mat-action-row>
+      
     </mat-expansion-panel>
 
     <mat-expansion-panel [disabled]="step < 2" [expanded]="step === 2" (opened)="setStep(2)" hideToggle>
         <mat-expansion-panel-header>
             <mat-panel-title>
-                Modelni tahlil qilish
+               Natija
             </mat-panel-title>
             <mat-panel-description>
-                Hozil bo'lgan modelnit testlash
+                Natijani tahlil qilish
                 <mat-icon>check</mat-icon>
             </mat-panel-description>
         </mat-expansion-panel-header>
-        <hr>
+ 
         <div>
             <hot-table class="table-first" height="58vh" [data]="result" [settings]="hotSettings1">
             </hot-table>
         </div>
-        <mat-action-row>
-            <button mat-button color="warn" (click)="prevStep()">Previous</button>
-            <button mat-button color="primary" (click)="nextStep()">End</button>
-        </mat-action-row>
+        <mat-action-row dir="ltr">
+            <button mat-raised-button color="warn" (click)="prevStep()">Qayta hisoblash</button>
+            <mat-checkbox #inputSave value="true" color="primary">Kiruvchi bilan</mat-checkbox>
+            <button mat-raised-button color="primary" (click)="saqlashNatija(inputSave.checked)">Saqlash</button>
+          </mat-action-row>
     </mat-expansion-panel>
 </mat-accordion>

@@ -20,7 +20,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
   selectedWB!: XLSX.WorkBook;
   selectedSheet: any;
   sheets: { name: string, data: any }[] = [];
-
+  statusText = "";
   columns!: Array<any>;
   displayedColumns!: Array<any>;
   objectNameExist = true;
@@ -194,15 +194,17 @@ export class UmbComponent implements OnInit, AfterViewInit {
 
         const data = msg.data;
         switch (data.type) {
-          case 'progress': this.progressValue += data.data; break;
+          case 'progress': {
+            this.progressValue += data.progress;
+            this.statusText = data.data;
+          } break;
           case 'error': {
             this.progress = false;
+            this.statusText = data.data;
           } break;
           case 'success': {
             this.progress = false;
             this.result = data.data;
-            console.log(this.result);
-
             this.setStep(2);
           } break;
         }
@@ -221,6 +223,15 @@ export class UmbComponent implements OnInit, AfterViewInit {
 
 
 
+  }
+  saqlashNatija(berilgan: boolean) {
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(this.result), "Natija");
+    if(berilgan)
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(this.selectedSheet.data), "Kiruvchi");
+    /* save to file */
+    XLSX.writeFile(wb, 'Natija.xlsx');
   }
 
   xatoXabar(errors: string[]) {
