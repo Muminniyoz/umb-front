@@ -149,8 +149,8 @@ class UMB {
     }
     console.log(this.ax);
 
-    
-    
+
+
     this.changeProgress(60, "Alomatlar vaznini saralash")
 
     this.R.sort((a, b) => b.w - a.w);
@@ -160,12 +160,14 @@ class UMB {
     // hisoblash
 
     for (let al = 0; al < this.m; al++) {
+      let rmas = [-1, 1];
       if (mas[0][al] == 1) {
-        this.miqdoriy(al, [-1, 1][Math.floor(Math.random() * 2)]);
+        let r = rmas[Math.floor(Math.random() * 100) % 2];
+        this.miqdoriy(al, r);
       }
-    } 
-    
-   
+    }
+
+
 
     this.changeProgress(80, "R(s) ni hisoblash")
     // R(S) ni hisoblash 
@@ -188,8 +190,8 @@ class UMB {
       this.rs[i].r = (this.ax[i][0] - cmin) / (cmax - cmin);
     }
     this.changeProgress(90, "R(s) ni saralash")
-   console.log(this.rs);
-   
+    console.log(this.rs);
+
     this.rs.sort((a, b) => b.r - a.r);
 
 
@@ -266,12 +268,12 @@ class UMB {
 
     // har elementlarni sanash - gradatsiya
     for (let i = 1; i < this.n; i++) {
-  
-        p.add(this.a[i][al])
+
+      p.add(this.a[i][al])
     }
     let t2 = p.size;
- 
-    
+
+
     // lyamdani hisoblash
     let g: Map<string, Map<string, number>> = new Map();
 
@@ -279,25 +281,25 @@ class UMB {
       let mas = new Map<string, number>();
       for (let i = 1; i < this.n; i++) {
         if (sinf == this.obyektSinflar[i]) {
-            const t = this.a[i][al];
-            mas.set(t, (mas.get(t) ?? 0) + 1);
+          const t = this.a[i][al];
+          mas.set(t, (mas.get(t) ?? 0) + 1);
         }
       }
       g.set(sinf, mas);
-    }  
+    }
 
     // cheklangan sifn
     let c1 = this.sinfTurlar[0];
     let c2 = this.sinfTurlar[1];
 
     let s = 0;
-    for(let t of p){
+    for (let t of p) {
       s += (g.get(c1)?.get(t) ?? 0) * (g.get(c2)?.get(t) ?? 0);
     }
     let lyam = 1 - s / (this.sinfAzoSon[c1] * this.sinfAzoSon[c2])
-    
-   
-    
+
+
+
     // DD - vesni hisoblash
     let l = [0, 0, 0];
     let d = [0, 0, 0];
@@ -305,40 +307,40 @@ class UMB {
     l[1] = g.get(c1)?.size ?? 0;
     l[2] = g.get(c2)?.size ?? 0;
 
-    if(t2 > 2){
-      d[1] = (this.sinfAzoSon[c1] - l[1]+1)*(this.sinfAzoSon[c1] - l[1]);
-      d[2] = (this.sinfAzoSon[c2] - l[2]+1)*(this.sinfAzoSon[c2] - l[2]);
+    if (t2 > 2) {
+      d[1] = (this.sinfAzoSon[c1] - l[1] + 1) * (this.sinfAzoSon[c1] - l[1]);
+      d[2] = (this.sinfAzoSon[c2] - l[2] + 1) * (this.sinfAzoSon[c2] - l[2]);
     } else {
-      d[1]=this.sinfAzoSon[c1]*(this.sinfAzoSon[c1]-1);
-      d[2]=this.sinfAzoSon[c2]*(this.sinfAzoSon[c2]-1)
+      d[1] = this.sinfAzoSon[c1] * (this.sinfAzoSon[c1] - 1);
+      d[2] = this.sinfAzoSon[c2] * (this.sinfAzoSon[c2] - 1)
     }
     // Bettani hisoblash
     s = 0;
-    if(d[1]+d[2] != 0){
-      for(let t of p){
-        let u11 = g.get(c1)?.get(t) ??  0;
-        let u21 = g.get(c2)?.get(t) ??  0;
-        
-        s += u11 *(u11-1) + u21 * (u21-1) ;
+    if (d[1] + d[2] != 0) {
+      for (let t of p) {
+        let u11 = g.get(c1)?.get(t) ?? 0;
+        let u21 = g.get(c2)?.get(t) ?? 0;
+
+        s += u11 * (u11 - 1) + u21 * (u21 - 1);
       }
-      s = s / (d[1]+d[2]);
+      s = s / (d[1] + d[2]);
     }
     let v = lyam * s;
 
     // tanijani yozish
     this.R[al] = {};
     this.R[al].k = al;
-    this.R[al].t=0;
-    this.R[al].c0=0;
-    this.R[al].c1=0;
-    this.R[al].c2=0;
-    this.R[al].w=v;
-    this.ax[0][al+1]=0;
+    this.R[al].t = 0;
+    this.R[al].c0 = 0;
+    this.R[al].c1 = 0;
+    this.R[al].c2 = 0;
+    this.R[al].w = v;
+    this.ax[0][al + 1] = 0;
 
     // Myuni hisoblash
-    for(let i = 1; i<this.n; i++){
-      this.ax[i][al+1]= v * ((g.get(c1)?.get(this.a[i][al])??0)/this.sinfAzoSon[c1] - (g.get(c2)?.get(this.a[i][al])??0)/this.sinfAzoSon[c2]) ;     
-      }
+    for (let i = 1; i < this.n; i++) {
+      this.ax[i][al + 1] = v * ((g.get(c1)?.get(this.a[i][al]) ?? 0) / this.sinfAzoSon[c1] - (g.get(c2)?.get(this.a[i][al]) ?? 0) / this.sinfAzoSon[c2]);
+    }
 
   }
   // miqdoriy alomatlarni hisoblash
@@ -458,14 +460,14 @@ class UMB {
     };
   }
   static miqdoriy(al: number, ti: number) {
-    this.ax[0][al+1] = ti;
-   
-    
+    this.ax[0][al + 1] = ti;
+
+
 
     let w = ti * this.cc[3][al];
     let p = this.cc[2][al] - this.cc[0][al];
     for (let i = 1; i < this.n; i++) {
-      this.ax[i][al+1] = w * (this.a[i][al] - this.cc[1][al]) / p;
+      this.ax[i][al + 1] = w * (this.a[i][al] - this.cc[1][al]) / p;
     }
   }
 
