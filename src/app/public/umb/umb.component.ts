@@ -21,6 +21,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
   selectedSheet: any;
   sheets: { name: string, data: any }[] = [];
   statusText = "";
+  calculationError = false;
   columns!: Array<any>;
   displayedColumns!: Array<any>;
   objectNameExist = true;
@@ -90,12 +91,12 @@ export class UmbComponent implements OnInit, AfterViewInit {
 
 
     /* save to file */
-    XLSX.writeFile(wb, 'ProDon.xlsx');
+    XLSX.writeFile(wb, 'Sidon output.xlsx');
   }
 
   ngAfterViewInit(): void {
 
-    this.http.get('assets/template/ProDon- UMB - example file.xlsx', { responseType: 'arraybuffer' }).subscribe(data => {
+    this.http.get('assets/template/SIDON - example file.xlsx', { responseType: 'arraybuffer' }).subscribe(data => {
       this.seperate(data);
     },
       error => {
@@ -121,7 +122,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
     reader.readAsArrayBuffer(target.files[0]);
   }
   namunaYuklash() {
-    window.open('assets/template/ProDon- UMB - example file.xlsx');
+    window.open('assets/template/SIDON - example file.xlsx');
   }
 
   changesheet(sheet: any) {
@@ -186,6 +187,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
 
   }
   startCalculation() {
+    this.calculationError = false;
     this.progress = true;
     this.progressValue = 0;
     if (typeof Worker !== 'undefined') {
@@ -202,6 +204,7 @@ export class UmbComponent implements OnInit, AfterViewInit {
           case 'error': {
             this.progress = false;
             this.statusText = data.data;
+            this.calculationError = true;
           } break;
           case 'success': {
             this.progress = false;

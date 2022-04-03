@@ -53,18 +53,22 @@ class UMB {
   static rs: Record1[] | any[] = [];
   static rm: Record1 | any;
 
-  // natijalarni yozib olish uchun
-  static result: any[] = [];
-
-
-
 
 
 
   public static start(data: any[]) {
-  
+
     setTimeout(() => {
-      this.seperate(data);
+      try {
+        this.seperate(data)
+      } catch (er) {
+        this.subject$.next({
+          type: 'error',
+          progress: 0,
+          data: er
+        });
+      }
+
     }, 10);
 
     return this.subject$;
@@ -133,13 +137,20 @@ class UMB {
     }
     this.changeProgress(50, "Alomatlar vaznini hisoblash")
 
-    for (let al = 0; al < m; al++) {
+
+    for (let al = 0; al < this.m; al++) {
+
+
       if (mas[0][al] == 1) {
         this.p_miqdory(al);
       } else {
         this.nominal(al);
       }
     }
+    console.log(this.ax);
+
+    
+    
     this.changeProgress(60, "Alomatlar vaznini saralash")
 
     this.R.sort((a, b) => b.w - a.w);
@@ -147,16 +158,20 @@ class UMB {
     this.changeProgress(70, "Obyektlar vaznini hisoblash")
 
     // hisoblash
+
     for (let al = 0; al < this.m; al++) {
       if (mas[0][al] == 1) {
         this.miqdoriy(al, [-1, 1][Math.floor(Math.random() * 2)]);
       }
-    }
+    } 
+    
+   
 
     this.changeProgress(80, "R(s) ni hisoblash")
-    // R(S) ni hisoblash
+    // R(S) ni hisoblash 
+    console.log(this.ax);
     this.RotS();
-
+    console.log(this.ax);
     let cmax = this.ax[1][0];
     let cmin = cmax;
     for (let i = 2; i < this.n; i++) {
@@ -173,43 +188,47 @@ class UMB {
       this.rs[i].r = (this.ax[i][0] - cmin) / (cmax - cmin);
     }
     this.changeProgress(90, "R(s) ni saralash")
-
+   console.log(this.rs);
+   
     this.rs.sort((a, b) => b.r - a.r);
-  
+
 
 
 
     // natijani yozish
     this.changeProgress(95, "Natijani tayyorlash")
-
-    this.result.push(Array(10).fill('', 0, 10));
-    this.result[0][0] = "Natija";
-    this.result.push([]);
-    this.result.push(["Alomatlar hissasi"]);
-    this.result.push(['№', 'Alomat', 'c0', 'c1', 'c2', 'Alomat vazni', 'u11', 'u12', 'u21', 'u22']);
+    const result = [];
+    result.push(Array(10).fill('', 0, 10));
+    result[0][0] = "Natija";
+    result.push([]);
+    result.push(["Alomatlar hissasi"]);
+    result.push(['№', 'Alomat', 'c0', 'c1', 'c2', 'Alomat vazni', 'u11', 'u12', 'u21', 'u22']);
     for (let i = 0; i < this.m; i++) {
-      this.result.push([i + 1, this.alomatNomlar[this.R[i].k], this.R[i].c0, this.R[i].c1, this.R[i].c2, this.R[i].w,
+      result.push([i + 1, this.alomatNomlar[this.R[i].k], this.R[i].c0, this.R[i].c1, this.R[i].c2, this.R[i].w,
       this.R[i].u11, this.R[i].u12, this.R[i].u21, this.R[i].u22]);
     }
 
 
     this.changeProgress(98, "Natijani tayyorlash")
 
-    this.result.push([]);
-    this.result.push([]);
-    this.result.push(['R(s) jadvali']);
-    this.result.push([]);
-    this.result.push(["№", 'KOD', d[1][1], 'Sinf', "Bahosi"]);
-    for (let i = 1; i < this.n - 1; i++) {
-           this.result.push([i, this.obyektKodlar[this.rs[i].t], this.obyektNomlar[this.rs[i].t], this.rs[i].k, this.rs[i].r]);
+    result.push([]);
+    result.push([]);
+    result.push(['R(s) jadvali']);
+    result.push([]);
+    result.push(["№", 'KOD', d[1][1], 'Sinf', "Bahosi"]);
+
+
+    for (let i = 0; i < this.n - 1; i++) {
+      result.push([i + 1, this.obyektKodlar[this.rs[i].t], this.obyektNomlar[this.rs[i].t], this.rs[i].k, this.rs[i].r]);
     }
+    result.push([]);
 
     this.changeProgress(99, "Natijani chiqarish")
 
     this.subject$.next({
       type: 'success',
       progress: 0,
-      data: this.result
+      data: result
     });
 
   }
@@ -237,6 +256,89 @@ class UMB {
 
   // nominal ustunlarni hisoblahs
   static nominal(al: number) {
+
+    let p = new Set<string>();
+
+
+    // for(let i = 0; i<t2; i++){
+    //   p[i] = 0;
+    // }
+
+    // har elementlarni sanash - gradatsiya
+    for (let i = 1; i < this.n; i++) {
+  
+        p.add(this.a[i][al])
+    }
+    let t2 = p.size;
+ 
+    
+    // lyamdani hisoblash
+    let g: Map<string, Map<string, number>> = new Map();
+
+    for (let sinf of this.sinfTurlar) {
+      let mas = new Map<string, number>();
+      for (let i = 1; i < this.n; i++) {
+        if (sinf == this.obyektSinflar[i]) {
+            const t = this.a[i][al];
+            mas.set(t, (mas.get(t) ?? 0) + 1);
+        }
+      }
+      g.set(sinf, mas);
+    }  
+
+    // cheklangan sifn
+    let c1 = this.sinfTurlar[0];
+    let c2 = this.sinfTurlar[1];
+
+    let s = 0;
+    for(let t of p){
+      s += (g.get(c1)?.get(t) ?? 0) * (g.get(c2)?.get(t) ?? 0);
+    }
+    let lyam = 1 - s / (this.sinfAzoSon[c1] * this.sinfAzoSon[c2])
+    
+   
+    
+    // DD - vesni hisoblash
+    let l = [0, 0, 0];
+    let d = [0, 0, 0];
+
+    l[1] = g.get(c1)?.size ?? 0;
+    l[2] = g.get(c2)?.size ?? 0;
+
+    if(t2 > 2){
+      d[1] = (this.sinfAzoSon[c1] - l[1]+1)*(this.sinfAzoSon[c1] - l[1]);
+      d[2] = (this.sinfAzoSon[c2] - l[2]+1)*(this.sinfAzoSon[c2] - l[2]);
+    } else {
+      d[1]=this.sinfAzoSon[c1]*(this.sinfAzoSon[c1]-1);
+      d[2]=this.sinfAzoSon[c2]*(this.sinfAzoSon[c2]-1)
+    }
+    // Bettani hisoblash
+    s = 0;
+    if(d[1]+d[2] != 0){
+      for(let t of p){
+        let u11 = g.get(c1)?.get(t) ??  0;
+        let u21 = g.get(c2)?.get(t) ??  0;
+        
+        s += u11 *(u11-1) + u21 * (u21-1) ;
+      }
+      s = s / (d[1]+d[2]);
+    }
+    let v = lyam * s;
+
+    // tanijani yozish
+    this.R[al] = {};
+    this.R[al].k = al;
+    this.R[al].t=0;
+    this.R[al].c0=0;
+    this.R[al].c1=0;
+    this.R[al].c2=0;
+    this.R[al].w=v;
+    this.ax[0][al+1]=0;
+
+    // Myuni hisoblash
+    for(let i = 1; i<this.n; i++){
+      this.ax[i][al+1]= v * ((g.get(c1)?.get(this.a[i][al])??0)/this.sinfAzoSon[c1] - (g.get(c2)?.get(this.a[i][al])??0)/this.sinfAzoSon[c2]) ;     
+      }
 
   }
   // miqdoriy alomatlarni hisoblash
@@ -356,12 +458,14 @@ class UMB {
     };
   }
   static miqdoriy(al: number, ti: number) {
-    this.ax[0][al + 1] = ti;
+    this.ax[0][al+1] = ti;
+   
+    
 
     let w = ti * this.cc[3][al];
     let p = this.cc[2][al] - this.cc[0][al];
     for (let i = 1; i < this.n; i++) {
-      this.ax[i][al + 1] = w * (this.a[i][al] - this.cc[1][al]) / p;
+      this.ax[i][al+1] = w * (this.a[i][al] - this.cc[1][al]) / p;
     }
   }
 
@@ -377,19 +481,18 @@ class UMB {
       }
       this.ax[i][0] = s;
       c[i] = s;
-
     }
     let c0 = this.staxastik(c);
 
     let iter = 0;
     let t1 = 1;
-    let al = -1;
+    let al = 0;
 
 
-    while (iter < 10000) {
+    while (iter < 1000000) {
       al++;
       iter++;
-      if (al >= this.m) al = 0;
+      if (al > this.m) al = 1;
       if (this.ax[0][al] != 0) {
         for (let i = 1; i < this.n; i++) {
           c[i] = this.ax[i][0] - 2 * this.ax[i][al]
@@ -423,13 +526,9 @@ class UMB {
     }
 
     for (let i = this.sinfAzoSon[this.sinfTurlar[0]] + 1; i < this.n; i++) {
-
       if (smax < c[i]) smax = c[i];
     }
     return smin - smax;
-
-
-
   }
 
   private static changeProgress(value: number, msg: string) {

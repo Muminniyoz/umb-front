@@ -6,7 +6,7 @@
                 Ma'lumotlarni yuklash
             </mat-panel-title>
             <mat-panel-description>
-                Excel(.xlsx yoki .xls) faylni yuklang yoki jadvalni to'ldiring
+                <span class="spacer"></span>
                 <mat-icon>text_fields</mat-icon>
             </mat-panel-description>
         </mat-expansion-panel-header>
@@ -74,11 +74,11 @@
     <mat-expansion-panel [disabled]="step < 1" [expanded]="step === 1" (opened)="setStep(1)" hideToggle>
         <mat-expansion-panel-header>
             <mat-panel-title>
-                Hisoblash sozlamalari
+                Baholashni boshlash
             </mat-panel-title>
             <mat-panel-description>
-                Hisoblash sozlamalarini belgilang va boshlang
-                <mat-icon>settings</mat-icon>
+   <span class="spacer"></span>
+                <mat-icon>donut_large</mat-icon>
             </mat-panel-description>
         </mat-expansion-panel-header>
 
@@ -88,14 +88,20 @@
                 <mat-option value="1">Evrestik algoritm</mat-option>
             </mat-select>
         </mat-form-field> -->
-        <h2>Hisob kitib vaqti biroz vaqt oladi! Bu vaqt davomida boshqa sahifaga o'tmang!</h2>
-        <button mat-raised-button color="primary" (click)="startCalculation()">Hisob kitobni boshlash</button>
+        <h2>Hisoblash jarayoni biroz vaqt olishi mumkin! Bu vaqt davomida boshqa sahifaga o'tmasliginigiz zarur yo'qsa hisoblash bekor qilinishi mumkin.</h2>
+       <div style="text-align: right;">
+        <button mat-raised-button color="primary" (click)="startCalculation()">Boshlash</button>
+
+       </div>
         <div *ngIf="progress">
 
             <p>Progress: {{progressValue}}% / {{statusText}}</p>
 
             <mat-progress-bar mode="determinate" [value]="progressValue" color="primary"></mat-progress-bar>
 
+        </div>
+        <div *ngIf="calculationError" style="color: red;">
+                Xatolik: {{statusText}}
         </div>
       
     </mat-expansion-panel>
@@ -106,7 +112,7 @@
                Natija
             </mat-panel-title>
             <mat-panel-description>
-                Natijani tahlil qilish
+                <span class="spacer"></span>
                 <mat-icon>check</mat-icon>
             </mat-panel-description>
         </mat-expansion-panel-header>
